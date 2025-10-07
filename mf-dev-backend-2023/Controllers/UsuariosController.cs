@@ -1,7 +1,9 @@
 ﻿using mf_dev_backend_2023.Models;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
 using System;
@@ -12,6 +14,7 @@ using System.Threading.Tasks;
 
 namespace mf_dev_backend_2023.Controllers
 {
+    [Authorize(Roles ="Admin")]
     public class UsuariosController : Controller
     {
         private readonly AppDbContext _context;
@@ -27,12 +30,21 @@ namespace mf_dev_backend_2023.Controllers
             return View(await _context.Usuarios.ToListAsync());
         }
 
+        [AllowAnonymous]
+        public IActionResult AcessDenied() 
+        {
+            return View();
+
+        }
+
+        [AllowAnonymous]
         public IActionResult Login()
         {
             return View();
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public async Task<IActionResult> Login(Usuario usuario)
         {
             var dados = await _context.Usuarios.FindAsync(usuario.Id);
@@ -76,6 +88,7 @@ namespace mf_dev_backend_2023.Controllers
             return View();
         }
 
+        [AllowAnonymous]
         public async Task<IActionResult> Logout() 
         {
             await HttpContext.SignOutAsync();
